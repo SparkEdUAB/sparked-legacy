@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    platform: linux/amd64  # Ensure consistent platform
+    ports:
+      - "3000:3000"
+    environment:
+      - ROOT_URL=http://localhost:3000
+      - MONGO_URL=mongodb://mongo:27017/meteor
+      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
+    depends_on:
+      - mongo
+    volumes:
+      - ./public/uploads:/app/public/uploads
+
+  mongo:
+    image: mongo:4.4
+    platform: linux/amd64  # Ensure consistent platform
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
