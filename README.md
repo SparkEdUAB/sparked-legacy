@@ -1,6 +1,6 @@
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/SparkEdUAB/SparkEd) 
 
-# SparkEd
+# SparkEd - Legacy
 
 [![Build Status](https://travis-ci.com/SparkEdUAB/SparkEd.svg?branch=master)](https://travis-ci.com/SparkEdUAB/SparkEd)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -11,7 +11,7 @@ SparkEd was deployed on a server and it loaded more than 1,500 resources. It wor
 
 To get started check out [our wiki](https://github.com/SparkEdUAB/SparkEd/wiki)
 
-[Check here](https://sparkeduab.github.io/sparked-manual/) for the online documentation how to use this project and a small demo here https://sparkedv2.herokuapp.com/ accessible on big screens.
+For a more actively maintained version of sparked, check here https://github.com/SparkEdUAB/sparked-next and the live version here https://sparkednext.app/
 
 **Note**: We only support Node^10  
 
