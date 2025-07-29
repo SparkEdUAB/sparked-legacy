@@ -17,7 +17,7 @@ Meteor.startup(function() {
   fs = Npm.require('fs'); //file system(fs)
   http = require('http');
   util = require('util');
-  request = require('request');
+  
   Fiber = require('fibers');
   exec = require('child_process').exec;
   // sys = require('sys');
@@ -31,7 +31,7 @@ Meteor.startup(function() {
     // you can write any logic you want.
     // but this callback does not run inside a fiber
     // at the end, you must return either true or false
-    return req.method == 'POST';
+    return req.method==='POST';
   });
 });
 
@@ -125,19 +125,15 @@ Meteor.methods({
     console.log('URL =' + hostUrl);
     var url = hostUrl + 'stats'; //"http://localhost:3000/stats";
     //var data = EJSON.stringify(statistics);
-
-    HTTP.call('POST', url, { params: { statistics: statistics, isSchool: school } }, function(
-      error,
-      result,
-    ) {
+    try {
+      const result = HTTP.call('POST', url, {
+        params: { statistics: statistics, isSchool: school },
+      });
       console.log(url, result);
-
-      if (!error) {
-        return true;
-      } else {
-        return false;
-      }
-    });
+      return true;
+    } catch (error) {
+      return false;
+    }
   },
 });
 
@@ -156,15 +152,12 @@ Meteor.methods({
     var size = users.length;
     users = JSON.stringify(users);
 
-    HTTP.call('POST', url, { params: { users: users, isSchool: school } }, function(error, result) {
-      if (!error) {
-        return true;
-        console.log(url, result);
-      } else {
-        return false;
-      }
-    });
-
+    try {
+      const result = HTTP.call('POST', url, { params: { users: users, isSchool: school } });
+      console.log(url, result);
+    } catch (error) {
+      // ignore
+    }
     return size;
   },
 });
@@ -198,13 +191,13 @@ Meteor.methods({
       );
     }
 
-    if (data.freq == undefined) {
+    if (data.freq===undefined) {
       freq = 1;
     } else {
       freq = data.freq;
     }
 
-    if (data.isSchool == undefined) {
+    if (data.isSchool===undefined) {
       isSchool = school;
     }
 
@@ -250,7 +243,7 @@ Meteor.methods({
     var val = false;
     var status = true;
     var results = null;
-    if (mCollections[fileType] == undefined) {
+    if (mCollections[fileType]===undefined) {
       return null;
     } else if (reset) {
       val = true;
@@ -262,19 +255,19 @@ Meteor.methods({
 
     query['sync.' + isSchool] = val;
 
-    if (fileType == 'egranary') {
+    if (fileType==='egranary') {
       results = mCollections[fileType].find({});
-    } else if (fileType == 'admin') {
+    } else if (fileType==='admin') {
       results = mCollections[fileType].find({});
     } else {
-      results = mCollections[fileType].find({ query });
+      results = mCollections[fileType].find(query);
     }
 
     results.forEach(function(v) {
       let id = v._id;
       let sync = v.sync;
 
-      if (sync == undefined) {
+      if (sync===undefined) {
         sync = {};
       }
 
@@ -310,7 +303,7 @@ Meteor.methods({
       resourceIndex = 0;
       resources = resourcesData;
       console.log('new  resources loaded ==>' + resources.length);
-    } else if (resources.length == 0) {
+    } else if (resources.length===0) {
       //no resources found resources.length < 1 && Array.isArray(resourcesData)
       console.log('no resources found ');
       isSyncRuning = false;
@@ -337,7 +330,7 @@ Meteor.methods({
     //checking if file already exist on server
     fs.stat(resourcePath, function(err, stats) {
       //check if file already exists and is of the same size
-      if (stats && stats.size == resourceSize) {
+      if (stats && stats.size===resourceSize) {
         //file already exist and is ok skip file
         console.log(resourceName + ' =>' + stats.size + ' <=> ' + resourceSize);
         skippedResource = true;
@@ -350,7 +343,7 @@ Meteor.methods({
         console.log('BROKEN FILE ' + resourceName + ' =>' + stats.size + ' <=> ' + resourceSize);
 
         // file already exist and is broken or needs to be replaced
-        fs.unlinkSync(path); //delete file #############################
+        fs.unlinkSync(resourcePath); //delete file #############################
         // download missing file
         fileStatus = true;
       } else if (err && err.errno === 34) {
@@ -385,7 +378,6 @@ Meteor.methods({
       resourceName: resourceName,
       resourceSize: resourceSize,
       chunkSizeDiff: chunkSizeDiff,
-      resourceIndex: resourceIndex,
       chunkSize: chunkSize,
       resources: resources.length,
       resourceIndex: resourceIndex,
@@ -408,9 +400,9 @@ Meteor.methods({
 //get Resource progeress
 Meteor.methods({
   setResource: function(resource) {
-    if (resource.path == 'update') {
+    if (resource.path==='update') {
       resourcePath = updatePath + resource.name;
-    } else if (resource.path == 'upload') {
+    } else if (resource.path==='upload') {
       resourcePath = uploadPath + resource.name;
     } else {
       isSyncRuning = false;
@@ -508,9 +500,9 @@ WebApp.connectHandlers.use('/syncApp', function(req, res, next) {
   var isSchool = req.query.isSchool;
   var reset = req.query.reset;
 
-  if (file == undefined || isSchool == undefined) {
+  if (file===undefined || isSchool===undefined) {
     res.end('request undefined');
-  } else if (reset == undefined) {
+  } else if (reset===undefined) {
     reset = false;
   }
 
@@ -518,7 +510,7 @@ WebApp.connectHandlers.use('/syncApp', function(req, res, next) {
   var content = Meteor.call('getSyncContent', file, isSchool, reset);
   var data = [];
   var dataJSON = '';
-  if (file == 'resource') {
+  if (file==='resource') {
     //check to make sure that the file actually exists
     var cleanData = [];
     content.forEach(function(v) {
@@ -531,7 +523,7 @@ WebApp.connectHandlers.use('/syncApp', function(req, res, next) {
     });
 
     var data = JSON.stringify(cleanData);
-    var dataJSON = EJSON.stringify(data);
+    var dataJSON = EJSON.stringify(cleanData);
   } else {
     var data = JSON.stringify(content);
     var dataJSON = EJSON.stringify(data);
@@ -549,7 +541,7 @@ Picker.route('/stats/', function(params, req, res, next) {
   var isSchool = req.body.isSchool;
   //console.log('mmmmmmmmmmmmm');
 
-  if (statistics == undefined) {
+  if (statistics===undefined) {
     console.log('STATAS FAILED');
     res.end('request undefined');
     return;
@@ -571,14 +563,14 @@ Picker.route('/stats/', function(params, req, res, next) {
 Picker.route('/userss', function(params, req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.writeHead(200);
-  var users = req.body.users;
+  var users = JSON.parse(req.body.users);
   var isSchool = req.body.isSchool;
   //console.log('mmmmmmmmmmmmm');
 
   // var users = EJSON.parse(users);
-  var users = JSON.stringify(users)
+  //  var users = JSON.stringify(users)
   //console.log(users);
-  if (users == undefined) {
+  if (users===undefined) {
     res.end('request undefined');
     return;
   }
@@ -637,12 +629,12 @@ Picker.route('/filesize/', function(params, req, res, next) {
   var filePath = null; //specific path of file on the server
   console.log(resource);
 
-  if (resource == undefined || path == undefined) {
+  if (resource === undefined || path===undefined) {
     res.end('request undefined');
     return;
-  } else if (path == 'update') {
+  } else if (path === 'update') {
     filePath = updatePath + resource;
-  } else if (path == 'upload') {
+  } else if (path === 'upload') {
     filePath = uploadPath + resource;
   } else {
     filePath = publicPath + resource;
@@ -703,7 +695,6 @@ Meteor.methods({
       );
       return true;
     } else {
-      ``;
       return false;
     }
   },

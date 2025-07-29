@@ -2,8 +2,8 @@
 import { Roles } from 'meteor/alanning:roles';
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
-import 'materialize-css/dist/css/materialize.min.css';
-import 'materialize-css/dist/js/materialize';
+// import 'materialize-css/dist/css/materialize.min.css';
+// import 'materialize-css/dist/js/materialize';
 import '../imports/ui/stylesheets/wizard.css';
 import '../imports/ui/stylesheets/loader.css';
 import '../imports/ui/stylesheets/landing.css';
